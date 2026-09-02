@@ -47,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Nook',
+                'So-Lowkey',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
               ),

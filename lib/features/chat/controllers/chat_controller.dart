@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/message_model.dart';
 
 /// Realtime stream of messages for a given connection, ordered oldest-first.
-/// Nook is strictly asynchronous: no typing indicators, no read markers —
+/// So-Lowkey is strictly asynchronous: no typing indicators, no read markers —
 /// this stream only ever reflects persisted messages.
 final chatMessagesProvider = StreamProvider.autoDispose
     .family<List<MessageModel>, String>((ref, connectionId) {

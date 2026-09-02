@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../features/auth/controllers/auth_controller.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/discovery/screens/discovery_screen.dart';
@@ -72,7 +71,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final connectionId = state.pathParameters['connectionId']!;
           final peerAlias =
-              state.uri.queryParameters['alias'] ?? 'Nook Companion';
+              state.uri.queryParameters['alias'] ?? 'So-Lowkey Companion';
           return ChatDetailScreen(
             connectionId: connectionId,
             peerAlias: peerAlias,

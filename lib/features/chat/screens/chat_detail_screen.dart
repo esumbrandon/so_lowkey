@@ -14,7 +14,7 @@ class ChatDetailScreen extends ConsumerStatefulWidget {
   const ChatDetailScreen({
     super.key,
     required this.connectionId,
-    this.peerAlias = 'Nook Companion',
+    this.peerAlias = 'So-Lowkey Companion',
   });
 
   @override

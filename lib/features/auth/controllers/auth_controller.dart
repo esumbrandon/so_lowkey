@@ -33,14 +33,14 @@ class AuthController {
   Future<void> signInWithGoogle() {
     return _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: 'io.nook.app://login-callback',
+      redirectTo: 'io.solowkey.app://login-callback',
     );
   }
 
   Future<void> signInWithApple() {
     return _client.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: 'io.nook.app://login-callback',
+      redirectTo: 'io.solowkey.app://login-callback',
     );
   }
 

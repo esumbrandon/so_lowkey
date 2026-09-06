@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/mock/mock_data.dart';
+import '../../../core/widgets/app_nav_menu.dart';
 import '../controllers/ambient_audio_controller.dart';
 import '../controllers/lounge_controller.dart';
 import '../models/lounge_model.dart';
@@ -28,6 +30,11 @@ class LoungeScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
         title: const Text('Lounges'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.dashboard_customize_outlined),
+            tooltip: 'Dev Screen Switcher',
+            onPressed: () => showAppNavigationModal(context),
+          ),
           IconButton(
             icon: const Icon(Icons.explore_outlined),
             tooltip: 'Discover people',
@@ -127,7 +134,9 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
   Widget build(BuildContext context) {
     final presenceAsync = ref.watch(loungePresenceProvider(widget.lounge.id));
     final audioState = ref.watch(ambientAudioProvider);
-    final myId = Supabase.instance.client.auth.currentUser?.id;
+    final myId = isSupabaseConfigured
+        ? Supabase.instance.client.auth.currentUser?.id
+        : mockUserId;
 
     return Scaffold(
       appBar: AppBar(

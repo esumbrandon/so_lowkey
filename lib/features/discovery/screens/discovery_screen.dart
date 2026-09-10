@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_nav_menu.dart';
 import '../controllers/discovery_controller.dart';
 import '../models/profile_model.dart';
 
@@ -25,7 +26,16 @@ class DiscoveryScreen extends ConsumerWidget {
       await controller.sendConnectionRequest(profile.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sent a quiet hello to ${profile.alias}.')),
+          SnackBar(
+            content: Text('Sent a quiet hello to ${profile.alias}.'),
+            action: SnackBarAction(
+              label: 'Open Chat',
+              textColor: AppColors.biscuit,
+              onPressed: () {
+                context.go('/chat/demo_chat_${profile.id}?alias=${profile.alias}');
+              },
+            ),
+          ),
         );
         ref.invalidate(discoveryProvider);
       }
@@ -49,6 +59,11 @@ class DiscoveryScreen extends ConsumerWidget {
         title: const Text('Discover'),
         backgroundColor: AppColors.background,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.dashboard_customize_outlined),
+            tooltip: 'Dev Screen Switcher',
+            onPressed: () => showAppNavigationModal(context),
+          ),
           IconButton(
             icon: const Icon(Icons.forest_outlined),
             tooltip: 'Lounges',

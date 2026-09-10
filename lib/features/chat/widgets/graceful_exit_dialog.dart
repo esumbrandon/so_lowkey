@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/mock/mock_data.dart';
+import '../controllers/chat_controller.dart';
 
-class GracefulExitDialog extends StatelessWidget {
+class GracefulExitDialog extends ConsumerWidget {
   final String connectionId;
   const GracefulExitDialog({super.key, required this.connectionId});
 
@@ -12,37 +15,58 @@ class GracefulExitDialog extends StatelessWidget {
     "My social energy is currently depleted. Wishing you the best!",
   ];
 
-  Future<void> _executeExit(BuildContext context, String reason) async {
-    final client = Supabase.instance.client;
-    final userId = client.auth.currentUser?.id;
-    if (userId == null) return;
+  Future<void> _executeExit(BuildContext context, WidgetRef ref, String reason) async {
+    if (!isSupabaseConfigured) {
+      ref.read(devMessagesNotifierProvider.notifier).addMessage(
+        connectionId: connectionId,
+        content: reason,
+        isGracefulExit: true,
+      );
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gracefully exited conversation.')),
+        );
+      }
+      return;
+    }
 
-    // 1. Post graceful closing system message
-    await client.from('messages').insert({
-      'connection_id': connectionId,
-      'sender_id': userId,
-      'content': reason,
-      'is_graceful_exit': true,
-    });
+    try {
+      final client = Supabase.instance.client;
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) return;
 
-    // 2. Mark connection as gracefully closed
-    await client
-        .from('connections')
-        .update({
-          'status': 'gracefully_closed',
-          'closed_reason': reason,
-          'closed_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', connectionId);
+      // 1. Post graceful closing system message
+      await client.from('messages').insert({
+        'connection_id': connectionId,
+        'sender_id': userId,
+        'content': reason,
+        'is_graceful_exit': true,
+      });
 
-    if (context.mounted) {
-      Navigator.of(context).pop(); // Dismiss modal
-      Navigator.of(context).pop(); // Exit chat screen
+      // 2. Mark connection as gracefully closed
+      await client
+          .from('connections')
+          .update({
+            'status': 'gracefully_closed',
+            'closed_reason': reason,
+            'closed_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', connectionId);
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      }
+    } catch (_) {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
       backgroundColor: AppColors.surfaceElevated,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -64,7 +88,7 @@ class GracefulExitDialog extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => _executeExit(context, opt),
+                onTap: () => _executeExit(context, ref, opt),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(

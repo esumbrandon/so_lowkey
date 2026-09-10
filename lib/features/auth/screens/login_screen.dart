@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/mock/mock_data.dart';
+import '../../../core/widgets/app_nav_menu.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -21,8 +24,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
     try {
       await signInFn();
+      if (mounted) {
+        context.go('/lounges');
+      }
     } catch (e) {
-      setState(() => _error = 'Could not sign in. Please try again.');
+      if (!isSupabaseConfigured && mounted) {
+        context.go('/lounges');
+      } else {
+        setState(() => _error = 'Could not sign in. Please try again.');
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -40,6 +50,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: const Icon(Icons.dashboard_customize_outlined),
+                  tooltip: 'Dev Screen Switcher',
+                  color: AppColors.textMuted,
+                  onPressed: () => showAppNavigationModal(context),
+                ),
+              ),
+              const Spacer(),
               const Icon(
                 Icons.nightlight_round,
                 color: AppColors.biscuit,
@@ -83,6 +103,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 background: AppColors.surfaceElevated,
                 foreground: AppColors.textPrimary,
               ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.biscuit,
+                  side: const BorderSide(color: AppColors.biscuit),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                icon: const Icon(Icons.explore_outlined, size: 20),
+                label: const Text(
+                  'Explore App (Dev Mode)',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                onPressed: () => context.go('/lounges'),
+              ),
+              const Spacer(),
             ],
           ),
         ),

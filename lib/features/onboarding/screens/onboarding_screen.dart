@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/mock/mock_data.dart';
+import '../../../core/widgets/app_nav_menu.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -38,9 +40,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _submitOnboarding() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-
     if (_aliasController.text.trim().isEmpty) {
       setState(() {
         _currentStep = 0;
@@ -54,17 +53,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       _error = null;
     });
 
+    if (!isSupabaseConfigured) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (mounted) context.go('/lounges');
+      return;
+    }
+
     try {
-      await Supabase.instance.client.from('profiles').upsert({
-        'id': user.id,
-        'alias': _aliasController.text.trim(),
-        'battery_status': _batteryStatus,
-        'reply_pace': _replyPace,
-        'spark_prompt': _selectedPrompt,
-        'spark_answer': _answerController.text.trim(),
-        'is_discoverable': true,
-        'max_active_chats': 3,
-      });
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        await Supabase.instance.client.from('profiles').upsert({
+          'id': user.id,
+          'alias': _aliasController.text.trim(),
+          'battery_status': _batteryStatus,
+          'reply_pace': _replyPace,
+          'spark_prompt': _selectedPrompt,
+          'spark_answer': _answerController.text.trim(),
+          'is_discoverable': true,
+          'max_active_chats': 3,
+        });
+      }
 
       if (mounted) context.go('/lounges');
     } catch (e) {
@@ -86,12 +94,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Step ${_currentStep + 1} of 3',
-                style: const TextStyle(
-                  color: AppColors.biscuit,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Step ${_currentStep + 1} of 3',
+                    style: const TextStyle(
+                      color: AppColors.biscuit,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.dashboard_customize_outlined, size: 20),
+                        tooltip: 'Dev Screen Switcher',
+                        color: AppColors.textMuted,
+                        onPressed: () => showAppNavigationModal(context),
+                      ),
+                      TextButton(
+                        onPressed: () => context.go('/lounges'),
+                        child: const Text(
+                          'Skip',
+                          style: TextStyle(color: AppColors.textMuted),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Expanded(

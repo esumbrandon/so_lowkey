@@ -7,10 +7,21 @@ import 'core/theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
-  );
+  const supabaseUrl = 'YOUR_SUPABASE_URL';
+  const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+
+  if (supabaseUrl != 'YOUR_SUPABASE_URL' &&
+      supabaseKey != 'YOUR_SUPABASE_ANON_KEY' &&
+      supabaseUrl.isNotEmpty) {
+    try {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseKey,
+      );
+    } catch (e) {
+      debugPrint('Running in offline/dev mode: $e');
+    }
+  }
 
   runApp(const ProviderScope(child: SoLowkey()));
 }

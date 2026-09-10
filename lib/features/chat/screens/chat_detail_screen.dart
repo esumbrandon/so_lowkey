@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/mock/mock_data.dart';
 import '../controllers/chat_controller.dart';
 import '../models/message_model.dart';
 import '../widgets/graceful_exit_dialog.dart';
@@ -58,7 +59,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Message did not send. Try again.')),
+          const SnackBar(
+            content: Text('Could not send message. Please try again.'),
+          ),
         );
       }
     } finally {
@@ -76,7 +79,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final messagesAsync = ref.watch(chatMessagesProvider(widget.connectionId));
-    final myId = Supabase.instance.client.auth.currentUser?.id;
+    final myId = isSupabaseConfigured
+        ? Supabase.instance.client.auth.currentUser?.id
+        : mockUserId;
 
     return Scaffold(
       appBar: AppBar(

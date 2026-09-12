@@ -9,6 +9,12 @@ class ProfileModel {
   final String? sparkAnswer;
   final bool isDiscoverable;
 
+  // Location & social circle fields
+  final String? region;
+  final String? country;
+  final String? city;
+  final List<String> circles; // e.g. ['Tech', 'Books', 'Music']
+
   ProfileModel({
     required this.id,
     required this.alias,
@@ -19,9 +25,19 @@ class ProfileModel {
     this.sparkPrompt,
     this.sparkAnswer,
     required this.isDiscoverable,
+    this.region,
+    this.country,
+    this.city,
+    this.circles = const [],
   });
 
   factory ProfileModel.fromMap(Map<String, dynamic> map) {
+    // Supabase returns TEXT[] as List<dynamic>
+    final rawCircles = map['circles'];
+    final circles = rawCircles is List
+        ? rawCircles.map((e) => e.toString()).toList()
+        : <String>[];
+
     return ProfileModel(
       id: map['id'] as String,
       alias: map['alias'] as String? ?? 'Anonymous',
@@ -32,6 +48,10 @@ class ProfileModel {
       sparkPrompt: map['spark_prompt'] as String?,
       sparkAnswer: map['spark_answer'] as String?,
       isDiscoverable: map['is_discoverable'] as bool? ?? true,
+      region: map['region'] as String?,
+      country: map['country'] as String?,
+      city: map['city'] as String?,
+      circles: circles,
     );
   }
 
@@ -45,5 +65,11 @@ class ProfileModel {
       default:
         return 'Replies within days';
     }
+  }
+
+  /// Human-readable location string for display on the profile card.
+  String? get locationLabel {
+    final parts = [city, region, country].where((s) => s != null && s.isNotEmpty).toList();
+    return parts.isEmpty ? null : parts.join(', ');
   }
 }

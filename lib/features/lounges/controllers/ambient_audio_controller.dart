@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -26,17 +27,25 @@ class AmbientAudioNotifier extends StateNotifier<AsyncValue<bool>> {
       _player.play();
       state = const AsyncValue.data(true);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      // Don't push error into state — a broken audio stream should NOT crash
+      // the widget build. Log it and fall back to the stopped/false state.
+      debugPrint('AmbientAudio: failed to load "$url": $e\n$st');
+      _currentUrl = null;
+      state = const AsyncValue.data(false);
     }
   }
 
   Future<void> togglePlayPause() async {
-    if (_player.playing) {
-      await _player.pause();
-      state = const AsyncValue.data(false);
-    } else {
-      await _player.play();
-      state = const AsyncValue.data(true);
+    try {
+      if (_player.playing) {
+        await _player.pause();
+        state = const AsyncValue.data(false);
+      } else {
+        await _player.play();
+        state = const AsyncValue.data(true);
+      }
+    } catch (e) {
+      debugPrint('AmbientAudio: togglePlayPause error: $e');
     }
   }
 

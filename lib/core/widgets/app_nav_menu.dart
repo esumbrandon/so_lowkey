@@ -11,7 +11,7 @@ void showAppNavigationModal(BuildContext context) {
     ),
     builder: (ctx) {
       return SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -53,6 +53,15 @@ void showAppNavigationModal(BuildContext context) {
                 onTap: () {
                   Navigator.pop(ctx);
                   context.go('/discovery');
+                },
+              ),
+              _NavTile(
+                icon: Icons.connect_without_contact_outlined,
+                title: 'Connections',
+                subtitle: 'Active chats & pending connection requests',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.go('/connections');
                 },
               ),
               _NavTile(

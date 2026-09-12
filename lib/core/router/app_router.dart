@@ -7,6 +7,7 @@ import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/discovery/screens/discovery_screen.dart';
 import '../../features/lounges/screens/lounge_screen.dart';
 import '../../features/chat/screens/chat_detail_screen.dart';
+import '../../features/connections/screens/connections_screen.dart';
 
 import '../mock/mock_data.dart';
 
@@ -45,6 +46,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/lounges',
           builder: (context, state) => const LoungeScreen(),
+        ),
+        GoRoute(
+          path: '/connections',
+          builder: (context, state) => const ConnectionsScreen(),
         ),
         GoRoute(
           path: '/chat/:connectionId',
@@ -102,6 +107,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/lounges',
         builder: (context, state) => const LoungeScreen(),
+      ),
+      GoRoute(
+        path: '/connections',
+        builder: (context, state) => const ConnectionsScreen(),
       ),
       GoRoute(
         path: '/chat/:connectionId',

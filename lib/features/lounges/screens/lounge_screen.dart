@@ -36,6 +36,11 @@ class LoungeScreen extends ConsumerWidget {
             onPressed: () => showAppNavigationModal(context),
           ),
           IconButton(
+            icon: const Icon(Icons.connect_without_contact_outlined),
+            tooltip: 'My Connections',
+            onPressed: () => context.go('/connections'),
+          ),
+          IconButton(
             icon: const Icon(Icons.explore_outlined),
             tooltip: 'Discover people',
             onPressed: () => context.go('/discovery'),
@@ -112,21 +117,28 @@ class LoungeRoomScreen extends ConsumerStatefulWidget {
 }
 
 class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
+  // Cached eagerly so dispose() never calls ref.read() after unmount.
+  late final LoungeController _loungeController;
+  late final AmbientAudioNotifier _audioNotifier;
+
   @override
   void initState() {
     super.initState();
+    // Read once while ref is still valid and keep direct references.
+    _loungeController = ref.read(loungeControllerProvider);
+    _audioNotifier = ref.read(ambientAudioProvider.notifier);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(loungeControllerProvider).joinLounge(widget.lounge.id);
-      ref
-          .read(ambientAudioProvider.notifier)
-          .playLoungeTrack(widget.lounge.ambientAudioUrl);
+      _loungeController.joinLounge(widget.lounge.id);
+      _audioNotifier.playLoungeTrack(widget.lounge.ambientAudioUrl);
     });
   }
 
   @override
   void dispose() {
-    ref.read(loungeControllerProvider).leaveLounge();
-    ref.read(ambientAudioProvider.notifier).stop();
+    // Safe: these are plain Dart object references, not ref.read() calls.
+    _loungeController.leaveLounge();
+    _audioNotifier.stop();
     super.dispose();
   }
 
@@ -145,7 +157,7 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
         actions: [
           IconButton(
             icon: Icon(
-              audioState.value == true
+              audioState.valueOrNull == true
                   ? Icons.volume_up_outlined
                   : Icons.volume_off_outlined,
               color: AppColors.biscuit,
@@ -188,7 +200,7 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
                         color: AppColors.biscuit,
                       ),
                     ),
-                    error: (_, __) => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
                     data: (aliases) => others.isEmpty
                         ? const Center(
                             child: Text(

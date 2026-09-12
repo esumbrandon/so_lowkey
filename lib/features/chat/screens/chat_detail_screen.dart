@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
@@ -86,6 +87,16 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        leading: BackButton(
+          color: AppColors.textPrimary,
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/connections');
+            }
+          },
+        ),
         title: Text(widget.peerAlias),
         actions: [
           IconButton(
@@ -208,7 +219,7 @@ class _MessageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.duskLavender.withOpacity(0.4)),
+          border: Border.all(color: AppColors.duskLavender.withValues(alpha: 0.4)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,7 +280,7 @@ class _MessageBubble extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 color: isMine
-                    ? AppColors.background.withOpacity(0.6)
+                    ? AppColors.background.withValues(alpha: 0.6)
                     : AppColors.textMuted,
               ),
             ),

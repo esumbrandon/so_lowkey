@@ -66,5 +66,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- OAuth deep-link redirect for Supabase Auth (Apple / Google sign-in) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>io.solowkey.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.solowkey.app</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
+import '../../../core/utils/platform_adaptive.dart';
 import '../controllers/chat_controller.dart';
 
 class GracefulExitDialog extends ConsumerWidget {
@@ -15,15 +17,62 @@ class GracefulExitDialog extends ConsumerWidget {
     "My social energy is currently depleted. Wishing you the best!",
   ];
 
-  Future<void> _executeExit(BuildContext context, WidgetRef ref, String reason) async {
+  static Future<void> showAdaptive(
+    BuildContext context,
+    WidgetRef ref,
+    String connectionId,
+  ) async {
+    if (isApplePlatform) {
+      await showCupertinoModalPopup(
+        context: context,
+        builder: (ctx) => CupertinoActionSheet(
+          title: const Text('Graceful Exit'),
+          message: const Text(
+            'Leave this conversation without ghosting anxiety. Choose a calm departure message:',
+          ),
+          actions: exitOptions.map((opt) {
+            return CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _performExit(context, ref, connectionId, opt);
+              },
+              child: Text(
+                opt,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: AppColors.biscuit),
+              ),
+            );
+          }).toList(),
+          cancelButton: CupertinoActionSheetAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+        ),
+      );
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (_) => GracefulExitDialog(connectionId: connectionId),
+    );
+  }
+
+  static Future<void> _performExit(
+    BuildContext context,
+    WidgetRef ref,
+    String connectionId,
+    String reason,
+  ) async {
+    AppHaptics.medium();
     if (!isSupabaseConfigured) {
       ref.read(devMessagesNotifierProvider.notifier).addMessage(
-        connectionId: connectionId,
-        content: reason,
-        isGracefulExit: true,
-      );
+            connectionId: connectionId,
+            content: reason,
+            isGracefulExit: true,
+          );
       if (context.mounted) {
-        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Gracefully exited conversation.')),
         );
@@ -56,12 +105,9 @@ class GracefulExitDialog extends ConsumerWidget {
 
       if (context.mounted) {
         Navigator.of(context).pop();
-        Navigator.of(context).pop();
       }
     } catch (_) {
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
+      // Ignore network errors gracefully
     }
   }
 
@@ -88,7 +134,10 @@ class GracefulExitDialog extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => _executeExit(context, ref, opt),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _performExit(context, ref, connectionId, opt);
+                },
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -98,8 +147,8 @@ class GracefulExitDialog extends ConsumerWidget {
                   child: Text(
                     opt,
                     style: const TextStyle(
-                      fontSize: 12,
                       color: AppColors.textPrimary,
+                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -108,6 +157,12 @@ class GracefulExitDialog extends ConsumerWidget {
           ),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+        ),
+      ],
     );
   }
 }

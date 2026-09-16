@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
-import '../../../core/widgets/app_nav_menu.dart';
+import '../../../core/utils/platform_adaptive.dart';
+import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/ambient_audio_controller.dart';
 import '../controllers/lounge_controller.dart';
 import '../models/lounge_model.dart';
@@ -27,43 +27,48 @@ class LoungeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         title: const Text('Lounges'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.dashboard_customize_outlined),
-            tooltip: 'Dev Screen Switcher',
-            onPressed: () => showAppNavigationModal(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.connect_without_contact_outlined),
-            tooltip: 'My Connections',
-            onPressed: () => context.go('/connections'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.explore_outlined),
-            tooltip: 'Discover people',
-            onPressed: () => context.go('/discovery'),
-          ),
-        ],
       ),
       body: loungesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.biscuit),
-        ),
-        error: (err, st) => const Center(
-          child: Text(
-            'Could not load lounges.',
-            style: TextStyle(color: AppColors.textMuted),
+        loading: () => const LoungeSkeletonList(),
+        error: (err, st) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Could not load lounges.',
+                style: TextStyle(color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: () {
+                  AppHaptics.light();
+                  ref.invalidate(loungesProvider);
+                },
+                icon: const Icon(Icons.refresh, color: AppColors.biscuit),
+                label: const Text(
+                  'Try Again',
+                  style: TextStyle(color: AppColors.biscuit),
+                ),
+              ),
+            ],
           ),
         ),
-        data: (lounges) => ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: lounges.length,
-          itemBuilder: (context, index) {
-            final lounge = lounges[index];
-            return _LoungeTile(lounge: lounge);
+        data: (lounges) => RefreshIndicator.adaptive(
+          color: AppColors.biscuit,
+          onRefresh: () async {
+            AppHaptics.light();
+            ref.invalidate(loungesProvider);
           },
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+            itemCount: lounges.length,
+            itemBuilder: (context, index) {
+              final lounge = lounges[index];
+              return _LoungeTile(lounge: lounge);
+            },
+          ),
         ),
       ),
     );
@@ -98,9 +103,14 @@ class _LoungeTile extends StatelessWidget {
               )
             : null,
         trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => LoungeRoomScreen(lounge: lounge)),
-        ),
+        onTap: () {
+          AppHaptics.light();
+          Navigator.of(context, rootNavigator: true).push(
+            buildAdaptivePageRoute(
+              builder: (_) => LoungeRoomScreen(lounge: lounge),
+            ),
+          );
+        },
       ),
     );
   }
@@ -153,6 +163,7 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        leading: const AdaptiveBackButton(),
         title: Text(widget.lounge.name),
         actions: [
           IconButton(
@@ -162,14 +173,16 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
                   : Icons.volume_off_outlined,
               color: AppColors.biscuit,
             ),
-            onPressed: () =>
-                ref.read(ambientAudioProvider.notifier).togglePlayPause(),
+            onPressed: () {
+              AppHaptics.selection();
+              ref.read(ambientAudioProvider.notifier).togglePlayPause();
+            },
           ),
         ],
       ),
       body: presenceAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.biscuit),
+          child: AdaptiveLoadingIndicator(),
         ),
         error: (err, st) => const Center(
           child: Text(
@@ -196,9 +209,7 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
                 Expanded(
                   child: aliasesAsync.when(
                     loading: () => const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.biscuit,
-                      ),
+                      child: AdaptiveLoadingIndicator(),
                     ),
                     error: (_, _) => const SizedBox.shrink(),
                     data: (aliases) => others.isEmpty

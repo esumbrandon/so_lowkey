@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
-import '../../../core/widgets/app_nav_menu.dart';
+import '../../../core/utils/platform_adaptive.dart';
+import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -18,6 +20,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _error;
 
   Future<void> _handleSignIn(Future<void> Function() signInFn) async {
+    AppHaptics.light();
     setState(() {
       _isLoading = true;
       _error = null;
@@ -50,15 +53,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: const Icon(Icons.dashboard_customize_outlined),
-                  tooltip: 'Dev Screen Switcher',
-                  color: AppColors.textMuted,
-                  onPressed: () => showAppNavigationModal(context),
-                ),
-              ),
               const Spacer(),
               const Icon(
                 Icons.nightlight_round,
@@ -104,22 +98,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 foreground: AppColors.textPrimary,
               ),
               const SizedBox(height: 16),
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.biscuit,
-                  side: const BorderSide(color: AppColors.biscuit),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              if (kDebugMode) ...[
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.biscuit,
+                    side: const BorderSide(color: AppColors.biscuit),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
+                  icon: const Icon(Icons.explore_outlined, size: 20),
+                  label: const Text(
+                    'Explore App (Dev Mode)',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  onPressed: () => context.go('/lounges'),
                 ),
-                icon: const Icon(Icons.explore_outlined, size: 20),
-                label: const Text(
-                  'Explore App (Dev Mode)',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-                onPressed: () => context.go('/lounges'),
-              ),
+              ],
               const Spacer(),
             ],
           ),
@@ -160,10 +157,10 @@ class _AuthButton extends StatelessWidget {
         ),
         onPressed: isLoading ? null : onPressed,
         icon: isLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            ? AdaptiveLoadingIndicator(
+                size: 18,
+                strokeWidth: 2,
+                color: foreground,
               )
             : Icon(icon),
         label: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),

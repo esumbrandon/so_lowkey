@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
+import '../../../core/utils/platform_adaptive.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -94,46 +96,69 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Progress indicator ──────────────────────────────────
-              Row(
-                children: [
-                  Text(
-                    'Step ${_currentStep + 1} of $_totalSteps',
-                    style: const TextStyle(
-                        color: AppColors.biscuit,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: (_currentStep + 1) / _totalSteps,
-                        backgroundColor: AppColors.surface,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                            AppColors.biscuit),
-                        minHeight: 4,
+    return PopScope(
+      canPop: _currentStep == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        AppHaptics.light();
+        setState(() => _currentStep--);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Progress indicator with adaptive back ─────────────
+                Row(
+                  children: [
+                    if (_currentStep > 0) ...[
+                      IconButton(
+                        icon: isApplePlatform
+                            ? const Icon(CupertinoIcons.chevron_back, size: 20)
+                            : const Icon(Icons.arrow_back, size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        color: AppColors.textMuted,
+                        onPressed: () {
+                          AppHaptics.light();
+                          setState(() => _currentStep--);
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      'Step ${_currentStep + 1} of $_totalSteps',
+                      style: const TextStyle(
+                          color: AppColors.biscuit,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: (_currentStep + 1) / _totalSteps,
+                          backgroundColor: AppColors.surface,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppColors.biscuit),
+                          minHeight: 4,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: _buildCurrentStep(),
+                  ],
                 ),
-              ),
-              _buildBottomButton(),
-            ],
+                const SizedBox(height: 12),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: _buildCurrentStep(),
+                  ),
+                ),
+                _buildBottomButton(),
+              ],
+            ),
           ),
         ),
       ),
@@ -264,7 +289,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     title:
                         Text(p, style: const TextStyle(fontSize: 14)),
                     value: p,
+                    // ignore: deprecated_member_use
                     groupValue: _selectedPrompt,
+                    // ignore: deprecated_member_use
                     onChanged: (val) =>
                         setState(() => _selectedPrompt = val!),
                   )),

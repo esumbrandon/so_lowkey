@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
-import '../../../core/widgets/app_nav_menu.dart';
+import '../../../core/utils/platform_adaptive.dart';
+import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/connections_controller.dart';
 import '../models/connection_model.dart';
 
@@ -40,6 +41,7 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
   }
 
   Future<void> _accept(ConnectionModel connection) async {
+    AppHaptics.medium();
     await ref.read(connectionsControllerProvider).accept(connection.id);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,7 +50,7 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
           action: SnackBarAction(
             label: 'Chat',
             textColor: AppColors.biscuit,
-            onPressed: () => context.go(
+            onPressed: () => context.push(
               '/chat/${connection.id}?alias=${connection.peerAlias}',
             ),
           ),
@@ -58,33 +60,16 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
   }
 
   Future<void> _decline(ConnectionModel connection) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveConfirmationDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Decline Request',
-            style: TextStyle(color: AppColors.textPrimary)),
-        content: Text(
-          'Remove the connection request from ${connection.peerAlias}?',
-          style: const TextStyle(color: AppColors.textMuted),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel',
-                style: TextStyle(color: AppColors.textMuted)),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-          TextButton(
-            child: const Text('Decline',
-                style: TextStyle(color: AppColors.terracotta)),
-            onPressed: () => Navigator.pop(context, true),
-          ),
-        ],
-      ),
+      title: 'Decline Request',
+      message: 'Remove the connection request from ${connection.peerAlias}?',
+      confirmText: 'Decline',
+      cancelText: 'Cancel',
+      isDestructive: true,
     );
     if (confirmed == true) {
+      AppHaptics.medium();
       await ref.read(connectionsControllerProvider).decline(connection.id);
     }
   }
@@ -93,11 +78,14 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
   Widget build(BuildContext context) {
     // In offline mode use the dev notifier; in live mode use the stream.
     final List<ConnectionModel> all;
+    final bool isLoading;
     if (!isSupabaseConfigured) {
       all = ref.watch(devConnectionsNotifierProvider);
+      isLoading = false;
     } else {
       final async = ref.watch(connectionsProvider);
       all = async.valueOrNull ?? [];
+      isLoading = async.isLoading && all.isEmpty;
     }
 
     final myId = _myId;
@@ -108,20 +96,7 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.background,
         title: const Text('Connections'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.dashboard_customize_outlined),
-            tooltip: 'Dev Screen Switcher',
-            onPressed: () => showAppNavigationModal(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.explore_outlined),
-            tooltip: 'Discover',
-            onPressed: () => context.go('/discovery'),
-          ),
-        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.biscuit,
@@ -155,64 +130,102 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // ── Active Tab ──────────────────────────────────────────────
-          active.isEmpty
-              ? _EmptyState(
-                  icon: Icons.chat_bubble_outline,
-                  message: 'No active conversations yet.\nSay hello to someone in Discover!',
-                  action: TextButton.icon(
-                    icon: const Icon(Icons.explore_outlined,
-                        color: AppColors.biscuit),
-                    label: const Text('Go to Discover',
-                        style: TextStyle(color: AppColors.biscuit)),
-                    onPressed: () => context.go('/discovery'),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 8, horizontal: 0),
-                  itemCount: active.length,
-                  separatorBuilder: (_, _) => const Divider(
-                    height: 1,
-                    indent: 84,
-                    color: AppColors.surface,
-                  ),
-                  itemBuilder: (context, index) {
-                    final conn = active[index];
-                    return _ActiveConnectionTile(
-                      connection: conn,
-                      onTap: () => context.go(
-                        '/chat/${conn.id}?alias=${conn.peerAlias}',
-                      ),
-                    );
+      body: isLoading
+          ? const ConnectionsSkeletonList()
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                // ── Active Tab ──────────────────────────────────────────────
+                RefreshIndicator.adaptive(
+                  color: AppColors.biscuit,
+                  onRefresh: () async {
+                    AppHaptics.light();
+                    if (isSupabaseConfigured) {
+                      ref.invalidate(connectionsProvider);
+                    }
                   },
+                  child: active.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            const SizedBox(height: 80),
+                            _EmptyState(
+                              icon: Icons.chat_bubble_outline,
+                              message:
+                                  'No active conversations yet.\nSay hello to someone in Discover!',
+                              action: TextButton.icon(
+                                icon: const Icon(Icons.explore_outlined,
+                                    color: AppColors.biscuit),
+                                label: const Text('Go to Discover',
+                                    style: TextStyle(color: AppColors.biscuit)),
+                                onPressed: () => context.go('/discovery'),
+                              ),
+                            ),
+                          ],
+                        )
+                      : ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
+                          itemCount: active.length,
+                          separatorBuilder: (_, _) => const Divider(
+                            height: 1,
+                            indent: 84,
+                            color: AppColors.surface,
+                          ),
+                          itemBuilder: (context, index) {
+                            final conn = active[index];
+                            return _ActiveConnectionTile(
+                              connection: conn,
+                              onTap: () {
+                                AppHaptics.light();
+                                context.push(
+                                  '/chat/${conn.id}?alias=${conn.peerAlias}',
+                                );
+                              },
+                            );
+                          },
+                        ),
                 ),
 
-          // ── Pending Tab ─────────────────────────────────────────────
-          pending.isEmpty
-              ? const _EmptyState(
-                  icon: Icons.person_add_outlined,
-                  message: 'No pending requests.\nRequests you send or receive will appear here.',
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: pending.length,
-                  itemBuilder: (context, index) {
-                    final conn = pending[index];
-                    final isIncoming = conn.isIncomingPending(myId);
-                    return _PendingConnectionTile(
-                      connection: conn,
-                      isIncoming: isIncoming,
-                      onAccept: isIncoming ? () => _accept(conn) : null,
-                      onDecline: isIncoming ? () => _decline(conn) : null,
-                    );
+                // ── Pending Tab ─────────────────────────────────────────────
+                RefreshIndicator.adaptive(
+                  color: AppColors.biscuit,
+                  onRefresh: () async {
+                    AppHaptics.light();
+                    if (isSupabaseConfigured) {
+                      ref.invalidate(connectionsProvider);
+                    }
                   },
+                  child: pending.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 80),
+                            _EmptyState(
+                              icon: Icons.person_add_outlined,
+                              message:
+                                  'No pending requests.\nRequests you send or receive will appear here.',
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
+                          itemCount: pending.length,
+                          itemBuilder: (context, index) {
+                            final conn = pending[index];
+                            final isIncoming = conn.isIncomingPending(myId);
+                            return _PendingConnectionTile(
+                              connection: conn,
+                              isIncoming: isIncoming,
+                              onAccept: isIncoming ? () => _accept(conn) : null,
+                              onDecline: isIncoming ? () => _decline(conn) : null,
+                            );
+                          },
+                        ),
                 ),
-        ],
-      ),
+              ],
+            ),
     );
   }
 }

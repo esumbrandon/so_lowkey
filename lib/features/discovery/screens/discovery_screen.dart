@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
-import '../../../core/widgets/app_nav_menu.dart';
+import '../../../core/utils/platform_adaptive.dart';
+import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/discovery_controller.dart';
 import '../models/profile_model.dart';
 
@@ -24,6 +25,7 @@ class DiscoveryScreen extends ConsumerWidget {
   ) async {
     final controller = ref.read(discoveryControllerProvider);
     try {
+      AppHaptics.medium();
       await controller.sendConnectionRequest(profile.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -33,7 +35,7 @@ class DiscoveryScreen extends ConsumerWidget {
               label: 'Open Chat',
               textColor: AppColors.biscuit,
               onPressed: () {
-                context.go('/chat/demo_chat_${profile.id}?alias=${profile.alias}');
+                context.push('/chat/demo_chat_${profile.id}?alias=${profile.alias}');
               },
             ),
           ),
@@ -59,20 +61,7 @@ class DiscoveryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Nerds'),
-        backgroundColor: AppColors.background,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.dashboard_customize_outlined),
-            tooltip: 'Dev Screen Switcher',
-            onPressed: () => showAppNavigationModal(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.forest_outlined),
-            tooltip: 'Lounges',
-            onPressed: () => context.go('/lounges'),
-          ),
-        ],
+        title: const Text('Discover'),
       ),
       body: Column(
         children: [
@@ -81,9 +70,7 @@ class DiscoveryScreen extends ConsumerWidget {
           // ── Profile List ──────────────────────────────────────────────
           Expanded(
             child: profilesAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.biscuit),
-              ),
+              loading: () => const DiscoveryCardSkeleton(),
               error: (err, st) => const Center(
                 child: Text(
                   'Something went quiet. Pull to try again.',
@@ -129,13 +116,14 @@ class DiscoveryScreen extends ConsumerWidget {
                     ),
                   );
                 }
-                return RefreshIndicator(
+                return RefreshIndicator.adaptive(
                   color: AppColors.biscuit,
                   onRefresh: () async {
+                    AppHaptics.light();
                     ref.invalidate(discoveryProvider(filter));
                   },
                   child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
                     itemCount: profiles.length,
                     itemBuilder: (context, index) {
                       final profile = profiles[index];

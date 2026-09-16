@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/mock/mock_data.dart';
+import '../../../core/utils/platform_adaptive.dart';
+import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/chat_controller.dart';
 import '../models/message_model.dart';
 import '../widgets/graceful_exit_dialog.dart';
@@ -50,6 +51,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     final text = _messageController.text;
     if (text.trim().isEmpty || _isSending) return;
 
+    AppHaptics.light();
     setState(() => _isSending = true);
     try {
       await ref
@@ -71,10 +73,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
   }
 
   void _showGracefulExit() {
-    showDialog(
-      context: context,
-      builder: (_) => GracefulExitDialog(connectionId: widget.connectionId),
-    );
+    GracefulExitDialog.showAdaptive(context, ref, widget.connectionId);
   }
 
   @override
@@ -87,16 +86,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        leading: BackButton(
-          color: AppColors.textPrimary,
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              context.go('/connections');
-            }
-          },
-        ),
+        leading: const AdaptiveBackButton(fallbackLocation: '/connections'),
         title: Text(widget.peerAlias),
         actions: [
           IconButton(
@@ -110,9 +100,7 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         children: [
           Expanded(
             child: messagesAsync.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.biscuit),
-              ),
+              loading: () => const ChatMessagesSkeleton(),
               error: (err, st) => const Center(
                 child: Text(
                   'Could not load this conversation.',
@@ -180,13 +168,10 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
                       backgroundColor: AppColors.biscuit,
                     ),
                     icon: _isSending
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.background,
-                            ),
+                        ? const AdaptiveLoadingIndicator(
+                            size: 18,
+                            strokeWidth: 2,
+                            color: AppColors.background,
                           )
                         : const Icon(
                             Icons.arrow_upward,

@@ -70,7 +70,7 @@ void showAppNavigationModal(BuildContext context) {
                 subtitle: 'Async chat with Rowan Moss & graceful exit',
                 onTap: () {
                   Navigator.pop(ctx);
-                  context.go('/chat/demo_chat_rowan?alias=Rowan Moss');
+                  context.push('/chat/demo_chat_rowan?alias=Rowan Moss');
                 },
               ),
               _NavTile(

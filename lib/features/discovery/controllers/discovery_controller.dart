@@ -43,61 +43,59 @@ const Object _sentinel = Object();
 
 /// Holds the currently active filter — stored in a StateProvider so the UI
 /// can update it and the [discoveryProvider] will automatically refresh.
-final discoveryFilterProvider =
-    StateProvider<DiscoveryFilter>((ref) => const DiscoveryFilter());
+final discoveryFilterProvider = StateProvider<DiscoveryFilter>(
+  (ref) => const DiscoveryFilter(),
+);
 
 /// Fetches discoverable profiles, excluding the current user and anyone
 /// already connected to them. Filtered by [DiscoveryFilter].
-final discoveryProvider =
-    FutureProvider.autoDispose.family<List<ProfileModel>, DiscoveryFilter>((
-  ref,
-  filter,
-) async {
-  if (!isSupabaseConfigured) {
-    return _applyFilterToMock(mockProfiles, filter);
-  }
+final discoveryProvider = FutureProvider.autoDispose
+    .family<List<ProfileModel>, DiscoveryFilter>((ref, filter) async {
+      if (!isSupabaseConfigured) {
+        return _applyFilterToMock(mockProfiles, filter);
+      }
 
-  try {
-    final client = Supabase.instance.client;
-    final userId = client.auth.currentUser?.id;
-    if (userId == null) return _applyFilterToMock(mockProfiles, filter);
+      try {
+        final client = Supabase.instance.client;
+        final userId = client.auth.currentUser?.id;
+        if (userId == null) return _applyFilterToMock(mockProfiles, filter);
 
-    final existingConnections = await client
-        .from('connections')
-        .select('initiator_id, recipient_id')
-        .or('initiator_id.eq.$userId,recipient_id.eq.$userId');
+        final existingConnections = await client
+            .from('connections')
+            .select('initiator_id, recipient_id')
+            .or('initiator_id.eq.$userId,recipient_id.eq.$userId');
 
-    final excludedIds = <String>{userId};
-    for (final row in existingConnections) {
-      excludedIds.add(row['initiator_id'] as String);
-      excludedIds.add(row['recipient_id'] as String);
-    }
+        final excludedIds = <String>{userId};
+        for (final row in existingConnections) {
+          excludedIds.add(row['initiator_id'] as String);
+          excludedIds.add(row['recipient_id'] as String);
+        }
 
-    var query = client
-        .from('profiles')
-        .select()
-        .eq('is_discoverable', true)
-        .not('id', 'in', '(${excludedIds.join(',')})');
+        var query = client
+            .from('profiles')
+            .select()
+            .eq('is_discoverable', true)
+            .not('id', 'in', '(${excludedIds.join(',')})');
 
-    if (filter.country != null) {
-      query = query.eq('country', filter.country!);
-    }
-    if (filter.region != null) {
-      query = query.eq('region', filter.region!);
-    }
-    if (filter.circle != null) {
-      query = query.contains('circles', [filter.circle!]);
-    }
+        if (filter.country != null) {
+          query = query.eq('country', filter.country!);
+        }
+        if (filter.region != null) {
+          query = query.eq('region', filter.region!);
+        }
+        if (filter.circle != null) {
+          query = query.contains('circles', [filter.circle!]);
+        }
 
-    final profiles = await query.limit(30);
+        final profiles = await query.limit(30);
 
-    return (profiles as List)
-        .map((p) => ProfileModel.fromMap(p as Map<String, dynamic>))
-        .toList();
-  } catch (_) {
-    return _applyFilterToMock(mockProfiles, filter);
-  }
-});
+        return (profiles as List)
+            .map((p) => ProfileModel.fromMap(p as Map<String, dynamic>))
+            .toList();
+      } catch (_) {
+        return _applyFilterToMock(mockProfiles, filter);
+      }
+    });
 
 /// Filters the mock profile list in the same way the Supabase query would.
 List<ProfileModel> _applyFilterToMock(

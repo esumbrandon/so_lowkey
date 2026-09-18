@@ -204,7 +204,9 @@ class _MessageBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.duskLavender.withValues(alpha: 0.4)),
+          border: Border.all(
+            color: AppColors.duskLavender.withValues(alpha: 0.4),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -34,10 +34,9 @@ final chatMessagesProvider = StreamProvider.autoDispose
     .family<List<MessageModel>, String>((ref, connectionId) {
       if (!isSupabaseConfigured) {
         final messages = ref.watch(devMessagesNotifierProvider);
-        final filtered = messages
-            .where((m) => m.connectionId == connectionId)
-            .toList()
-          ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        final filtered =
+            messages.where((m) => m.connectionId == connectionId).toList()
+              ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
         return Stream.value(filtered);
       }
 

@@ -54,14 +54,11 @@ class ShimmerSkeleton extends StatefulWidget {
     this.shape = BoxShape.rectangle,
   });
 
-  const ShimmerSkeleton.circle({
-    super.key,
-    required double size,
-    this.margin,
-  })  : width = size,
-        height = size,
-        borderRadius = size / 2,
-        shape = BoxShape.circle;
+  const ShimmerSkeleton.circle({super.key, required double size, this.margin})
+    : width = size,
+      height = size,
+      borderRadius = size / 2,
+      shape = BoxShape.circle;
 
   @override
   State<ShimmerSkeleton> createState() => _ShimmerSkeletonState();
@@ -80,9 +77,10 @@ class _ShimmerSkeletonState extends State<ShimmerSkeleton>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    _opacityAnim = Tween<double>(begin: 0.35, end: 0.75).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _opacityAnim = Tween<double>(
+      begin: 0.35,
+      end: 0.75,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -105,7 +103,9 @@ class _ShimmerSkeletonState extends State<ShimmerSkeleton>
             borderRadius: widget.shape == BoxShape.circle
                 ? null
                 : BorderRadius.circular(widget.borderRadius),
-            color: AppColors.surfaceElevated.withValues(alpha: _opacityAnim.value),
+            color: AppColors.surfaceElevated.withValues(
+              alpha: _opacityAnim.value,
+            ),
           ),
         );
       },
@@ -202,7 +202,11 @@ class DiscoveryCardSkeleton extends StatelessWidget {
               ],
             ),
             SizedBox(height: 28),
-            ShimmerSkeleton(width: double.infinity, height: 16, borderRadius: 6),
+            ShimmerSkeleton(
+              width: double.infinity,
+              height: 16,
+              borderRadius: 6,
+            ),
             SizedBox(height: 10),
             ShimmerSkeleton(width: 200, height: 16, borderRadius: 6),
             SizedBox(height: 24),
@@ -256,7 +260,10 @@ class ConnectionsSkeletonList extends StatelessWidget {
                     ShimmerSkeleton(width: 120, height: 16, borderRadius: 6),
                     SizedBox(height: 8),
                     ShimmerSkeleton(
-                        width: double.infinity, height: 12, borderRadius: 4),
+                      width: double.infinity,
+                      height: 12,
+                      borderRadius: 4,
+                    ),
                   ],
                 ),
               ),

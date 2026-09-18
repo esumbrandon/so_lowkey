@@ -70,10 +70,7 @@ ThemeData buildAppTheme() {
             fontWeight: FontWeight.w600,
           );
         }
-        return const TextStyle(
-          color: AppColors.textMuted,
-          fontSize: 11,
-        );
+        return const TextStyle(color: AppColors.textMuted, fontSize: 11);
       }),
     ),
     dividerTheme: const DividerThemeData(

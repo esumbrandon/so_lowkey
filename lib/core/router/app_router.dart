@@ -53,9 +53,8 @@ List<StatefulShellBranch> _buildShellBranches() {
       routes: [
         GoRoute(
           path: '/lounges',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: LoungeScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: LoungeScreen()),
         ),
       ],
     ),
@@ -64,9 +63,8 @@ List<StatefulShellBranch> _buildShellBranches() {
       routes: [
         GoRoute(
           path: '/discovery',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: DiscoveryScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: DiscoveryScreen()),
         ),
       ],
     ),
@@ -75,9 +73,8 @@ List<StatefulShellBranch> _buildShellBranches() {
       routes: [
         GoRoute(
           path: '/connections',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: ConnectionsScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: ConnectionsScreen()),
         ),
       ],
     ),
@@ -86,9 +83,8 @@ List<StatefulShellBranch> _buildShellBranches() {
       routes: [
         GoRoute(
           path: '/profile',
-          pageBuilder: (context, state) => const NoTransitionPage(
-            child: ProfileScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              const NoTransitionPage(child: ProfileScreen()),
         ),
       ],
     ),
@@ -102,18 +98,14 @@ List<RouteBase> _buildSharedExternalRoutes() {
     GoRoute(
       parentNavigatorKey: rootNavigatorKey,
       path: '/loading',
-      pageBuilder: (context, state) => buildAdaptivePage(
-        key: state.pageKey,
-        child: const AppSplashScreen(),
-      ),
+      pageBuilder: (context, state) =>
+          buildAdaptivePage(key: state.pageKey, child: const AppSplashScreen()),
     ),
     GoRoute(
       parentNavigatorKey: rootNavigatorKey,
       path: '/login',
-      pageBuilder: (context, state) => buildAdaptivePage(
-        key: state.pageKey,
-        child: const LoginScreen(),
-      ),
+      pageBuilder: (context, state) =>
+          buildAdaptivePage(key: state.pageKey, child: const LoginScreen()),
     ),
     GoRoute(
       parentNavigatorKey: rootNavigatorKey,
@@ -179,7 +171,9 @@ GoRouter _buildLiveRouter(Ref ref) {
       final location = state.matchedLocation;
 
       final isAuthRoute =
-          location == '/login' || location == '/onboarding' || location == '/loading';
+          location == '/login' ||
+          location == '/onboarding' ||
+          location == '/loading';
 
       // Unauthenticated users → login
       if (user == null) {

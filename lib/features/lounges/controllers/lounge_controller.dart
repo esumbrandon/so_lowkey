@@ -34,7 +34,8 @@ final loungePresenceProvider = StreamProvider.autoDispose
             .stream(primaryKey: ['user_id'])
             .eq('lounge_id', loungeId)
             .map(
-              (rows) => rows.map((r) => LoungePresenceModel.fromMap(r)).toList(),
+              (rows) =>
+                  rows.map((r) => LoungePresenceModel.fromMap(r)).toList(),
             );
       } catch (_) {
         return Stream.value(mockPresences[loungeId] ?? []);

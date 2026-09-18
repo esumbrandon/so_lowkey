@@ -131,8 +131,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     Text(
                       'Step ${_currentStep + 1} of $_totalSteps',
                       style: const TextStyle(
-                          color: AppColors.biscuit,
-                          fontWeight: FontWeight.w600),
+                        color: AppColors.biscuit,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -142,7 +143,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           value: (_currentStep + 1) / _totalSteps,
                           backgroundColor: AppColors.surface,
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.biscuit),
+                            AppColors.biscuit,
+                          ),
                           minHeight: 4,
                         ),
                       ),
@@ -192,8 +194,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 filled: true,
                 fillColor: AppColors.surface,
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -215,52 +218,61 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               style: TextStyle(color: AppColors.textMuted, height: 1.4),
             ),
             const SizedBox(height: 24),
-            const Text('Initial Battery Level',
-                style: TextStyle(
-                    color: AppColors.biscuit, fontWeight: FontWeight.w600)),
+            const Text(
+              'Initial Battery Level',
+              style: TextStyle(
+                color: AppColors.biscuit,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
-              children:
-                  ['recharging', 'low', 'medium', 'full'].map((lvl) {
+              children: ['recharging', 'low', 'medium', 'full'].map((lvl) {
                 final isSelected = _batteryStatus == lvl;
                 return ChoiceChip(
                   label: Text(lvl),
                   selected: isSelected,
                   selectedColor: AppColors.biscuit,
                   backgroundColor: AppColors.surface,
-                  onSelected: (val) =>
-                      setState(() => _batteryStatus = lvl),
+                  onSelected: (val) => setState(() => _batteryStatus = lvl),
                 );
               }).toList(),
             ),
             const SizedBox(height: 24),
-            const Text('Expected Reply Cadence',
-                style: TextStyle(
-                    color: AppColors.biscuit, fontWeight: FontWeight.w600)),
+            const Text(
+              'Expected Reply Cadence',
+              style: TextStyle(
+                color: AppColors.biscuit,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               initialValue: _replyPace,
               dropdownColor: AppColors.surfaceElevated,
               items: const [
                 DropdownMenuItem(
-                    value: 'same_day',
-                    child: Text('Within the same day')),
+                  value: 'same_day',
+                  child: Text('Within the same day'),
+                ),
                 DropdownMenuItem(
-                    value: 'few_days',
-                    child: Text('Within a few days (Comfortable)')),
+                  value: 'few_days',
+                  child: Text('Within a few days (Comfortable)'),
+                ),
                 DropdownMenuItem(
-                    value: 'slow_mail',
-                    child: Text('Slow Mail (Weekly pacing)')),
+                  value: 'slow_mail',
+                  child: Text('Slow Mail (Weekly pacing)'),
+                ),
               ],
-              onChanged: (val) =>
-                  setState(() => _replyPace = val!),
+              onChanged: (val) => setState(() => _replyPace = val!),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.surface,
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -283,18 +295,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 style: TextStyle(color: AppColors.textMuted, height: 1.4),
               ),
               const SizedBox(height: 16),
-              ..._prompts.map((p) => RadioListTile<String>(
-                    contentPadding: EdgeInsets.zero,
-                    activeColor: AppColors.biscuit,
-                    title:
-                        Text(p, style: const TextStyle(fontSize: 14)),
-                    value: p,
-                    // ignore: deprecated_member_use
-                    groupValue: _selectedPrompt,
-                    // ignore: deprecated_member_use
-                    onChanged: (val) =>
-                        setState(() => _selectedPrompt = val!),
-                  )),
+              ..._prompts.map(
+                (p) => RadioListTile<String>(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.biscuit,
+                  title: Text(p, style: const TextStyle(fontSize: 14)),
+                  value: p,
+                  // ignore: deprecated_member_use
+                  groupValue: _selectedPrompt,
+                  // ignore: deprecated_member_use
+                  onChanged: (val) => setState(() => _selectedPrompt = val!),
+                ),
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _answerController,
@@ -302,13 +314,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
                   hintText: 'Write your answer here...',
-                  hintStyle:
-                      const TextStyle(color: AppColors.textMuted),
+                  hintStyle: const TextStyle(color: AppColors.textMuted),
                   filled: true,
                   fillColor: AppColors.surface,
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ],
@@ -338,22 +350,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               const Text(
                 'Location',
                 style: TextStyle(
-                    color: AppColors.biscuit, fontWeight: FontWeight.w600),
+                  color: AppColors.biscuit,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: _countryController,
                 decoration: InputDecoration(
                   labelText: 'Country',
-                  prefixIcon: const Icon(Icons.public_outlined,
-                      color: AppColors.textMuted, size: 20),
-                  labelStyle:
-                      const TextStyle(color: AppColors.textMuted),
+                  prefixIcon: const Icon(
+                    Icons.public_outlined,
+                    color: AppColors.textMuted,
+                    size: 20,
+                  ),
+                  labelStyle: const TextStyle(color: AppColors.textMuted),
                   filled: true,
                   fillColor: AppColors.surface,
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -364,15 +381,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       controller: _regionController,
                       decoration: InputDecoration(
                         labelText: 'Region / State',
-                        prefixIcon: const Icon(Icons.terrain_outlined,
-                            color: AppColors.textMuted, size: 20),
-                        labelStyle:
-                            const TextStyle(color: AppColors.textMuted),
+                        prefixIcon: const Icon(
+                          Icons.terrain_outlined,
+                          color: AppColors.textMuted,
+                          size: 20,
+                        ),
+                        labelStyle: const TextStyle(color: AppColors.textMuted),
                         filled: true,
                         fillColor: AppColors.surface,
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none),
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
@@ -382,15 +402,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       controller: _cityController,
                       decoration: InputDecoration(
                         labelText: 'City',
-                        prefixIcon: const Icon(Icons.location_city_outlined,
-                            color: AppColors.textMuted, size: 20),
-                        labelStyle:
-                            const TextStyle(color: AppColors.textMuted),
+                        prefixIcon: const Icon(
+                          Icons.location_city_outlined,
+                          color: AppColors.textMuted,
+                          size: 20,
+                        ),
+                        labelStyle: const TextStyle(color: AppColors.textMuted),
                         filled: true,
                         fillColor: AppColors.surface,
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none),
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
@@ -404,14 +427,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const Text(
                     'Your Circles',
                     style: TextStyle(
-                        color: AppColors.biscuit,
-                        fontWeight: FontWeight.w600),
+                      color: AppColors.biscuit,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     '(${_selectedCircles.length} selected)',
                     style: const TextStyle(
-                        color: AppColors.textMuted, fontSize: 12),
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -439,7 +465,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.sage.withValues(alpha: 0.18)
@@ -489,7 +517,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           disabledBackgroundColor: AppColors.surface,
           disabledForegroundColor: AppColors.textMuted,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
         onPressed: canProceed
             ? () {

@@ -91,8 +91,9 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
     final myId = _myId;
     final active = all.where((c) => c.isActive || c.isClosed).toList();
     final pending = all.where((c) => c.status == 'pending').toList();
-    final incomingCount =
-        pending.where((c) => c.isIncomingPending(myId)).length;
+    final incomingCount = pending
+        .where((c) => c.isIncomingPending(myId))
+        .length;
 
     return Scaffold(
       appBar: AppBar(
@@ -154,10 +155,14 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
                               message:
                                   'No active conversations yet.\nSay hello to someone in Discover!',
                               action: TextButton.icon(
-                                icon: const Icon(Icons.explore_outlined,
-                                    color: AppColors.biscuit),
-                                label: const Text('Go to Discover',
-                                    style: TextStyle(color: AppColors.biscuit)),
+                                icon: const Icon(
+                                  Icons.explore_outlined,
+                                  color: AppColors.biscuit,
+                                ),
+                                label: const Text(
+                                  'Go to Discover',
+                                  style: TextStyle(color: AppColors.biscuit),
+                                ),
                                 onPressed: () => context.go('/discovery'),
                               ),
                             ),
@@ -219,7 +224,9 @@ class _ConnectionsScreenState extends ConsumerState<ConnectionsScreen>
                               connection: conn,
                               isIncoming: isIncoming,
                               onAccept: isIncoming ? () => _accept(conn) : null,
-                              onDecline: isIncoming ? () => _decline(conn) : null,
+                              onDecline: isIncoming
+                                  ? () => _decline(conn)
+                                  : null,
                             );
                           },
                         ),
@@ -238,10 +245,7 @@ class _ActiveConnectionTile extends StatelessWidget {
   final ConnectionModel connection;
   final VoidCallback onTap;
 
-  const _ActiveConnectionTile({
-    required this.connection,
-    required this.onTap,
-  });
+  const _ActiveConnectionTile({required this.connection, required this.onTap});
 
   static const _batteryIcons = {
     'recharging': Icons.battery_alert,
@@ -255,8 +259,7 @@ class _ActiveConnectionTile extends StatelessWidget {
     final isClosed = connection.isClosed;
 
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       leading: Stack(
         children: [
           CircleAvatar(
@@ -299,19 +302,14 @@ class _ActiveConnectionTile extends StatelessWidget {
               connection.peerAlias,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isClosed
-                    ? AppColors.textMuted
-                    : AppColors.textPrimary,
+                color: isClosed ? AppColors.textMuted : AppColors.textPrimary,
               ),
             ),
           ),
           if (connection.lastMessageAt != null)
             Text(
               _formatTime(connection.lastMessageAt!),
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.textMuted,
-              ),
+              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
             ),
         ],
       ),
@@ -324,10 +322,7 @@ class _ActiveConnectionTile extends StatelessWidget {
               connection.lastMessageContent!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 13,
-              ),
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
             )
           else
             Text(
@@ -350,10 +345,7 @@ class _ActiveConnectionTile extends StatelessWidget {
               const SizedBox(width: 3),
               Text(
                 connection.peerBatteryStatus,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.sage,
-                ),
+                style: const TextStyle(fontSize: 11, color: AppColors.sage),
               ),
               if (isClosed) ...[
                 const SizedBox(width: 8),
@@ -459,8 +451,7 @@ class _PendingConnectionTile extends StatelessWidget {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isIncoming
                       ? AppColors.biscuit.withValues(alpha: 0.15)
@@ -529,11 +520,7 @@ class _EmptyState extends StatelessWidget {
   final String message;
   final Widget? action;
 
-  const _EmptyState({
-    required this.icon,
-    required this.message,
-    this.action,
-  });
+  const _EmptyState({required this.icon, required this.message, this.action});
 
   @override
   Widget build(BuildContext context) {
@@ -548,15 +535,9 @@ class _EmptyState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                height: 1.5,
-              ),
+              style: const TextStyle(color: AppColors.textMuted, height: 1.5),
             ),
-            if (action != null) ...[
-              const SizedBox(height: 16),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 16), action!],
           ],
         ),
       ),

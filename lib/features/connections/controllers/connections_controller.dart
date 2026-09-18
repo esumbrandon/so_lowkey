@@ -5,8 +5,9 @@ import '../models/connection_model.dart';
 
 /// Streams all connections for the current user.
 /// In offline dev mode returns the [mockConnections] list as a single-value stream.
-final connectionsProvider =
-    StreamProvider.autoDispose<List<ConnectionModel>>((ref) {
+final connectionsProvider = StreamProvider.autoDispose<List<ConnectionModel>>((
+  ref,
+) {
   if (!isSupabaseConfigured) {
     return Stream.value(List.from(mockConnections));
   }
@@ -24,8 +25,10 @@ final connectionsProvider =
         .order('last_interaction_at', ascending: false)
         .map((rows) {
           final all = (rows as List)
-              .where((r) =>
-                  r['initiator_id'] == userId || r['recipient_id'] == userId)
+              .where(
+                (r) =>
+                    r['initiator_id'] == userId || r['recipient_id'] == userId,
+              )
               .toList();
 
           return _resolveConnections(all, userId, client);
@@ -49,7 +52,9 @@ Future<List<ConnectionModel>> _resolveConnections(
   for (final row in rows) {
     final isInitiator = row['initiator_id'] == myId;
     peerIds.add(
-      isInitiator ? row['recipient_id'] as String : row['initiator_id'] as String,
+      isInitiator
+          ? row['recipient_id'] as String
+          : row['initiator_id'] as String,
     );
   }
 
@@ -109,10 +114,10 @@ class DevConnectionsNotifier extends StateNotifier<List<ConnectionModel>> {
   }
 }
 
-final devConnectionsNotifierProvider = StateNotifierProvider<
-    DevConnectionsNotifier, List<ConnectionModel>>(
-  (ref) => DevConnectionsNotifier(),
-);
+final devConnectionsNotifierProvider =
+    StateNotifierProvider<DevConnectionsNotifier, List<ConnectionModel>>(
+      (ref) => DevConnectionsNotifier(),
+    );
 
 // ── Connections controller ────────────────────────────────────────────────────
 
@@ -129,10 +134,13 @@ class ConnectionsController {
 
     try {
       final client = Supabase.instance.client;
-      await client.from('connections').update({
-        'status': 'active',
-        'last_interaction_at': DateTime.now().toIso8601String(),
-      }).eq('id', connectionId);
+      await client
+          .from('connections')
+          .update({
+            'status': 'active',
+            'last_interaction_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', connectionId);
     } catch (_) {}
   }
 
@@ -145,10 +153,7 @@ class ConnectionsController {
 
     try {
       final client = Supabase.instance.client;
-      await client
-          .from('connections')
-          .delete()
-          .eq('id', connectionId);
+      await client.from('connections').delete().eq('id', connectionId);
     } catch (_) {}
   }
 }

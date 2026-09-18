@@ -69,7 +69,11 @@ class ProfileModel {
 
   /// Human-readable location string for display on the profile card.
   String? get locationLabel {
-    final parts = [city, region, country].where((s) => s != null && s.isNotEmpty).toList();
+    final parts = [
+      city,
+      region,
+      country,
+    ].where((s) => s != null && s.isNotEmpty).toList();
     return parts.isEmpty ? null : parts.join(', ');
   }
 }

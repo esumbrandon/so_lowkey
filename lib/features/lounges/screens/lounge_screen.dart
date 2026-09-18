@@ -26,9 +26,7 @@ class LoungeScreen extends ConsumerWidget {
     final loungesAsync = ref.watch(loungesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lounges'),
-      ),
+      appBar: AppBar(title: const Text('Lounges')),
       body: loungesAsync.when(
         loading: () => const LoungeSkeletonList(),
         error: (err, st) => Center(
@@ -181,9 +179,7 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
         ],
       ),
       body: presenceAsync.when(
-        loading: () => const Center(
-          child: AdaptiveLoadingIndicator(),
-        ),
+        loading: () => const Center(child: AdaptiveLoadingIndicator()),
         error: (err, st) => const Center(
           child: Text(
             'Could not load who is here.',
@@ -208,9 +204,8 @@ class _LoungeRoomScreenState extends ConsumerState<LoungeRoomScreen> {
                 const SizedBox(height: 16),
                 Expanded(
                   child: aliasesAsync.when(
-                    loading: () => const Center(
-                      child: AdaptiveLoadingIndicator(),
-                    ),
+                    loading: () =>
+                        const Center(child: AdaptiveLoadingIndicator()),
                     error: (_, _) => const SizedBox.shrink(),
                     data: (aliases) => others.isEmpty
                         ? const Center(

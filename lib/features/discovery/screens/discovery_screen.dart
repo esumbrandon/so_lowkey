@@ -35,7 +35,9 @@ class DiscoveryScreen extends ConsumerWidget {
               label: 'Open Chat',
               textColor: AppColors.biscuit,
               onPressed: () {
-                context.push('/chat/demo_chat_${profile.id}?alias=${profile.alias}');
+                context.push(
+                  '/chat/demo_chat_${profile.id}?alias=${profile.alias}',
+                );
               },
             ),
           ),
@@ -60,9 +62,7 @@ class DiscoveryScreen extends ConsumerWidget {
     final profilesAsync = ref.watch(discoveryProvider(filter));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Discover'),
-      ),
+      appBar: AppBar(title: const Text('Discover')),
       body: Column(
         children: [
           // ── Filter Bar ────────────────────────────────────────────────
@@ -85,8 +85,11 @@ class DiscoveryScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.search_off_rounded,
-                              size: 48, color: AppColors.textMuted),
+                          const Icon(
+                            Icons.search_off_rounded,
+                            size: 48,
+                            color: AppColors.textMuted,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             filter.isEmpty
@@ -98,16 +101,19 @@ class DiscoveryScreen extends ConsumerWidget {
                           if (!filter.isEmpty) ...[
                             const SizedBox(height: 16),
                             TextButton.icon(
-                              icon: const Icon(Icons.clear_all,
-                                  color: AppColors.biscuit),
+                              icon: const Icon(
+                                Icons.clear_all,
+                                color: AppColors.biscuit,
+                              ),
                               label: const Text(
                                 'Clear Filters',
                                 style: TextStyle(color: AppColors.biscuit),
                               ),
                               onPressed: () {
                                 ref
-                                    .read(discoveryFilterProvider.notifier)
-                                    .state = const DiscoveryFilter();
+                                        .read(discoveryFilterProvider.notifier)
+                                        .state =
+                                    const DiscoveryFilter();
                               },
                             ),
                           ],
@@ -158,9 +164,7 @@ class _FilterBar extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: const BoxDecoration(
         color: AppColors.background,
-        border: Border(
-          bottom: BorderSide(color: AppColors.surface, width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.surface, width: 1)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -174,7 +178,7 @@ class _FilterBar extends ConsumerWidget {
               onTap: () => _showCountryPicker(context, ref),
               onClear: filter.country != null
                   ? () => ref.read(discoveryFilterProvider.notifier).state =
-                      filter.copyWith(country: null)
+                        filter.copyWith(country: null)
                   : null,
             ),
             const SizedBox(width: 8),
@@ -186,7 +190,7 @@ class _FilterBar extends ConsumerWidget {
               onTap: () => _showRegionInput(context, ref),
               onClear: filter.region != null
                   ? () => ref.read(discoveryFilterProvider.notifier).state =
-                      filter.copyWith(region: null)
+                        filter.copyWith(region: null)
                   : null,
             ),
             const SizedBox(width: 8),
@@ -198,7 +202,7 @@ class _FilterBar extends ConsumerWidget {
               onTap: () => _showCirclePicker(context, ref),
               onClear: filter.circle != null
                   ? () => ref.read(discoveryFilterProvider.notifier).state =
-                      filter.copyWith(circle: null)
+                        filter.copyWith(circle: null)
                   : null,
             ),
             if (!filter.isEmpty) ...[
@@ -226,9 +230,21 @@ class _FilterBar extends ConsumerWidget {
 
   // ── Country picker ──────────────────────────────────────────────────────
   static const _popularCountries = [
-    'United States', 'United Kingdom', 'Canada', 'Australia',
-    'Germany', 'France', 'Japan', 'India', 'Brazil', 'Sweden',
-    'Netherlands', 'Nigeria', 'South Korea', 'New Zealand', 'Spain',
+    'United States',
+    'United Kingdom',
+    'Canada',
+    'Australia',
+    'Germany',
+    'France',
+    'Japan',
+    'India',
+    'Brazil',
+    'Sweden',
+    'Netherlands',
+    'Nigeria',
+    'South Korea',
+    'New Zealand',
+    'Spain',
   ];
 
   void _showCountryPicker(BuildContext context, WidgetRef ref) {
@@ -244,8 +260,9 @@ class _FilterBar extends ConsumerWidget {
         options: _popularCountries,
         selected: filter.country,
         onSelect: (value) {
-          ref.read(discoveryFilterProvider.notifier).state =
-              filter.copyWith(country: value);
+          ref.read(discoveryFilterProvider.notifier).state = filter.copyWith(
+            country: value,
+          );
           Navigator.pop(ctx);
         },
       ),
@@ -264,7 +281,9 @@ class _FilterBar extends ConsumerWidget {
       ),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
-          left: 20, right: 20, top: 20,
+          left: 20,
+          right: 20,
+          top: 20,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
         child: Column(
@@ -273,8 +292,10 @@ class _FilterBar extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.location_on_outlined,
-                    color: AppColors.biscuit),
+                const Icon(
+                  Icons.location_on_outlined,
+                  color: AppColors.biscuit,
+                ),
                 const SizedBox(width: 10),
                 const Text(
                   'Filter by Region',
@@ -298,8 +319,10 @@ class _FilterBar extends ConsumerWidget {
               style: const TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: 'e.g. Pacific Northwest, Kansai, Scotland…',
-                hintStyle:
-                    const TextStyle(color: AppColors.textMuted, fontSize: 14),
+                hintStyle: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 14,
+                ),
                 filled: true,
                 fillColor: AppColors.surface,
                 border: OutlineInputBorder(
@@ -309,8 +332,8 @@ class _FilterBar extends ConsumerWidget {
               ),
               onSubmitted: (value) {
                 if (value.trim().isNotEmpty) {
-                  ref.read(discoveryFilterProvider.notifier).state =
-                      filter.copyWith(region: value.trim());
+                  ref.read(discoveryFilterProvider.notifier).state = filter
+                      .copyWith(region: value.trim());
                 }
                 Navigator.pop(ctx);
               },
@@ -329,8 +352,8 @@ class _FilterBar extends ConsumerWidget {
                 onPressed: () {
                   final val = controller.text.trim();
                   if (val.isNotEmpty) {
-                    ref.read(discoveryFilterProvider.notifier).state =
-                        filter.copyWith(region: val);
+                    ref.read(discoveryFilterProvider.notifier).state = filter
+                        .copyWith(region: val);
                   }
                   Navigator.pop(ctx);
                 },
@@ -357,8 +380,9 @@ class _FilterBar extends ConsumerWidget {
         options: kAllCircles,
         selected: filter.circle,
         onSelect: (value) {
-          ref.read(discoveryFilterProvider.notifier).state =
-              filter.copyWith(circle: value);
+          ref.read(discoveryFilterProvider.notifier).state = filter.copyWith(
+            circle: value,
+          );
           Navigator.pop(ctx);
         },
       ),
@@ -415,10 +439,8 @@ class _PickerSheet extends StatelessWidget {
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: options.length,
-                separatorBuilder: (_, _) => const Divider(
-                  height: 1,
-                  color: AppColors.surface,
-                ),
+                separatorBuilder: (_, _) =>
+                    const Divider(height: 1, color: AppColors.surface),
                 itemBuilder: (context, index) {
                   final option = options[index];
                   final isSelected = option == selected;
@@ -474,7 +496,9 @@ class _FilterChipButton extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.biscuit.withValues(alpha: 0.15) : AppColors.surface,
+          color: isActive
+              ? AppColors.biscuit.withValues(alpha: 0.15)
+              : AppColors.surface,
           border: Border.all(
             color: isActive ? AppColors.biscuit : AppColors.surfaceElevated,
             width: 1.2,
@@ -494,8 +518,7 @@ class _FilterChipButton extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight:
-                    isActive ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                 color: isActive ? AppColors.biscuit : AppColors.textMuted,
               ),
             ),

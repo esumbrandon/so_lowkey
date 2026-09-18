@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import 'adaptive_loading.dart';
 
-
 class AppSplashScreen extends StatefulWidget {
   final String statusMessage;
 
@@ -70,10 +69,7 @@ class _AppSplashScreenState extends State<AppSplashScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: const RadialGradient(
-                        colors: [
-                          AppColors.biscuit,
-                          AppColors.surfaceElevated,
-                        ],
+                        colors: [AppColors.biscuit, AppColors.surfaceElevated],
                       ),
                       boxShadow: [
                         BoxShadow(

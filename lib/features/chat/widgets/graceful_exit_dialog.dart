@@ -67,7 +67,9 @@ class GracefulExitDialog extends ConsumerWidget {
   ) async {
     AppHaptics.medium();
     if (!isSupabaseConfigured) {
-      ref.read(devMessagesNotifierProvider.notifier).addMessage(
+      ref
+          .read(devMessagesNotifierProvider.notifier)
+          .addMessage(
             connectionId: connectionId,
             content: reason,
             isGracefulExit: true,
@@ -160,7 +162,10 @@ class GracefulExitDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: AppColors.textMuted),
+          ),
         ),
       ],
     );

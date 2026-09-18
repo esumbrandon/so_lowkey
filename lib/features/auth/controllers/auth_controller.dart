@@ -22,7 +22,8 @@ final currentUserProvider = Provider<User?>((ref) {
   }
   try {
     final authState = ref.watch(authStateProvider).valueOrNull;
-    return authState?.session?.user ?? Supabase.instance.client.auth.currentUser;
+    return authState?.session?.user ??
+        Supabase.instance.client.auth.currentUser;
   } catch (_) {
     return mockCurrentUser;
   }

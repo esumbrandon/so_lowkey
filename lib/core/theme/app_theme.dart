@@ -89,10 +89,7 @@ ThemeData buildAppTheme() {
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
         TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
       },
     ),
   );

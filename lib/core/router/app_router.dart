@@ -150,7 +150,7 @@ GoRouter _buildOfflineRouter() {
     navigatorKey: rootNavigatorKey,
     initialLocation: '/lounges',
     routes: [
-      // Main shell with bottom nav (mobile) or side rail (desktop/web)
+      // Main shell with bottom nav (mobile) or side rail (tablet)
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state, navigationShell) =>
@@ -199,7 +199,7 @@ GoRouter _buildLiveRouter(Ref ref) {
       return null;
     },
     routes: [
-      // Main shell with bottom nav (mobile) or side rail (desktop/web)
+      // Main shell with bottom nav (mobile) or side rail (tablet)
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state, navigationShell) =>

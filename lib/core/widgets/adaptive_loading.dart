@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../utils/platform_adaptive.dart';
 
-/// Platform-adaptive loading spinner.
-/// - iOS/macOS: [CupertinoActivityIndicator]
-/// - Android/Web/Desktop: [CircularProgressIndicator] with warm styling
 class AdaptiveLoadingIndicator extends StatelessWidget {
   final double size;
   final Color? color;

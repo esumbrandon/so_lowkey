@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/mock/mock_data.dart';
 import '../../../core/utils/platform_adaptive.dart';
 import '../../../core/widgets/adaptive_loading.dart';
 import '../controllers/profile_controller.dart';
@@ -149,16 +148,13 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
                 icon: Icons.battery_4_bar_outlined,
                 child: _BatteryPicker(
                   value: _profile.batteryStatus,
-                  onChanged: isSupabaseConfigured
-                      ? (v) {
-                          if (v != null)
-                            setState(
-                              () => _profile = _profile.copyWith(
-                                batteryStatus: v,
-                              ),
-                            );
-                        }
-                      : null,
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(
+                        () => _profile = _profile.copyWith(batteryStatus: v),
+                      );
+                    }
+                  },
                 ),
               ),
               const Divider(height: 1),
@@ -168,14 +164,13 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
                 icon: Icons.schedule_outlined,
                 child: _ReplyPacePicker(
                   value: _profile.replyPace,
-                  onChanged: isSupabaseConfigured
-                      ? (v) {
-                          if (v != null)
-                            setState(
-                              () => _profile = _profile.copyWith(replyPace: v),
-                            );
-                        }
-                      : null,
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(
+                        () => _profile = _profile.copyWith(replyPace: v),
+                      );
+                    }
+                  },
                 ),
               ),
             ],
@@ -209,11 +204,9 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
             ),
             value: _profile.isDiscoverable,
             activeThumbColor: AppColors.biscuit,
-            onChanged: isSupabaseConfigured
-                ? (v) => setState(
-                    () => _profile = _profile.copyWith(isDiscoverable: v),
-                  )
-                : null,
+            onChanged: (v) => setState(
+              () => _profile = _profile.copyWith(isDiscoverable: v),
+            ),
           ),
         ),
 
@@ -283,35 +276,33 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
           ),
         ],
 
-        if (isSupabaseConfigured) ...[
-          const SizedBox(height: 28),
-          SizedBox(
-            height: 50,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.biscuit,
-                foregroundColor: AppColors.background,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+        const SizedBox(height: 28),
+        SizedBox(
+          height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.biscuit,
+              foregroundColor: AppColors.background,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              onPressed: _isSaving ? null : _save,
-              child: _isSaving
-                  ? const AdaptiveLoadingIndicator(
-                      size: 20,
-                      strokeWidth: 2,
-                      color: AppColors.background,
-                    )
-                  : const Text(
-                      'Save Changes',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
-                    ),
             ),
+            onPressed: _isSaving ? null : _save,
+            child: _isSaving
+                ? const AdaptiveLoadingIndicator(
+                    size: 20,
+                    strokeWidth: 2,
+                    color: AppColors.background,
+                  )
+                : const Text(
+                    'Save Changes',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                  ),
           ),
-        ],
+        ),
 
         const SizedBox(height: 16),
         SizedBox(
@@ -375,11 +366,10 @@ class _SettingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
       child: child,
     );
   }

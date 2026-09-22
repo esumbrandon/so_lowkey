@@ -60,18 +60,24 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen>
 
     _sendButtonScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 0.80)
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.80,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 35,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.80, end: 1.12)
-            .chain(CurveTween(curve: Curves.easeOutBack)),
+        tween: Tween<double>(
+          begin: 0.80,
+          end: 1.12,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
         weight: 45,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.12, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween<double>(
+          begin: 1.12,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 20,
       ),
     ]).animate(_sendButtonScaleController);
@@ -83,13 +89,17 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen>
 
     _inputFieldScale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 0.97)
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.97,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 35,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.97, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOutBack)),
+        tween: Tween<double>(
+          begin: 0.97,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
         weight: 65,
       ),
     ]).animate(_inputFieldScaleController);
@@ -219,15 +229,23 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen>
               ),
               data: (serverMessages) {
                 // Deduplicate: remove any confirmed optimistic messages
-                _optimisticMessages.removeWhere((opt) => serverMessages.any(
+                _optimisticMessages.removeWhere(
+                  (opt) => serverMessages.any(
                     (srv) =>
                         srv.senderId == opt.senderId &&
                         srv.content == opt.content &&
-                        srv.createdAt.difference(opt.createdAt).inSeconds.abs() <
-                            10));
+                        srv.createdAt
+                                .difference(opt.createdAt)
+                                .inSeconds
+                                .abs() <
+                            10,
+                  ),
+                );
 
                 // Combine server messages with pending optimistic messages
-                final combinedMessages = List<MessageModel>.from(serverMessages);
+                final combinedMessages = List<MessageModel>.from(
+                  serverMessages,
+                );
                 for (final opt in _optimisticMessages) {
                   if (!combinedMessages.any((m) => m.id == opt.id)) {
                     combinedMessages.add(opt);
@@ -300,8 +318,9 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen>
                         textInputAction: TextInputAction.send,
                         decoration: InputDecoration(
                           hintText: 'Write at your own pace...',
-                          hintStyle:
-                              const TextStyle(color: AppColors.textMuted),
+                          hintStyle: const TextStyle(
+                            color: AppColors.textMuted,
+                          ),
                           filled: true,
                           fillColor: AppColors.surface,
                           contentPadding: const EdgeInsets.symmetric(
@@ -356,10 +375,7 @@ class _AnimatedSendButton extends StatelessWidget {
   final bool isSending;
   final VoidCallback? onPressed;
 
-  const _AnimatedSendButton({
-    required this.isSending,
-    required this.onPressed,
-  });
+  const _AnimatedSendButton({required this.isSending, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -447,19 +463,17 @@ class _AnimatedMessageBubbleState extends State<_AnimatedMessageBubble>
 
     if (widget.isMine) {
       // Outgoing: Launches directly from message box (shifted down & centered over input)
-      _translation = Tween<Offset>(
-        begin: const Offset(-38.0, 78.0),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-      );
+      _translation =
+          Tween<Offset>(
+            begin: const Offset(-38.0, 78.0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+          );
 
       // Scale expands out from compact launcher pill to full message bubble
       _scale = Tween<double>(begin: 0.68, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Curves.easeOutBack,
-        ),
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
       );
 
       // Subtle aerodynamic lift tilt that straightens into alignment
@@ -474,12 +488,13 @@ class _AnimatedMessageBubbleState extends State<_AnimatedMessageBubble>
       );
     } else {
       // Incoming: Slides gently from companion's side (left)
-      _translation = Tween<Offset>(
-        begin: const Offset(-28.0, 10.0),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-      );
+      _translation =
+          Tween<Offset>(
+            begin: const Offset(-28.0, 10.0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+          );
 
       _scale = Tween<double>(begin: 0.90, end: 1.0).animate(
         CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
@@ -543,8 +558,9 @@ class _AnimatedMessageBubbleState extends State<_AnimatedMessageBubble>
             angle: _rotation.value,
             child: Transform.scale(
               scale: _scale.value,
-              alignment:
-                  widget.isMine ? Alignment.bottomRight : Alignment.bottomLeft,
+              alignment: widget.isMine
+                  ? Alignment.bottomRight
+                  : Alignment.bottomLeft,
               child: Opacity(
                 opacity: _opacity.value.clamp(0.0, 1.0),
                 child: _MessageBubble(
@@ -601,7 +617,8 @@ class _MessageBubble extends StatelessWidget {
             bottomLeft: Radius.circular(isMine ? 16 : 4),
             bottomRight: Radius.circular(isMine ? 4 : 16),
           ),
-          boxShadow: shadows ??
+          boxShadow:
+              shadows ??
               [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.06),
@@ -660,9 +677,10 @@ class _GracefulExitBubbleState extends State<_GracefulExitBubble>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _scale = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scale = Tween<double>(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
     _opacity = CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.0, 0.5, curve: Curves.easeOut),

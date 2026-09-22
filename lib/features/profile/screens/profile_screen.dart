@@ -204,9 +204,8 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
             ),
             value: _profile.isDiscoverable,
             activeThumbColor: AppColors.biscuit,
-            onChanged: (v) => setState(
-              () => _profile = _profile.copyWith(isDiscoverable: v),
-            ),
+            onChanged: (v) =>
+                setState(() => _profile = _profile.copyWith(isDiscoverable: v)),
           ),
         ),
 
@@ -296,10 +295,7 @@ class _ProfileBodyState extends ConsumerState<_ProfileBody> {
                   )
                 : const Text(
                     'Save Changes',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                   ),
           ),
         ),

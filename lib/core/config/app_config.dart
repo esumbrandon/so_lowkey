@@ -4,11 +4,11 @@ class AppConfig {
   // Injected at build time via --dart-define (never hardcoded here).
   // Run with:
   //   flutter run --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...
-  static const String supabaseUrl =
-      String.fromEnvironment('SUPABASE_URL');
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 
-  static const String supabaseAnonKey =
-      String.fromEnvironment('SUPABASE_ANON_KEY');
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+  );
 
   static const String deepLinkScheme = 'io.solowkey.app';
 
